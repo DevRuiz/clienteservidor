@@ -5,6 +5,36 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
+from django.shortcuts import get_object_or_404
+from django.http import Http404
+
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework import generics
+
+#Importar el modelo
+from Login.models import Example2
+from Login.serializer import Example2Serializers
+
+class ExampleList2(APIView):
+    #METODO GET PARA SOLICTAR INFO
+    def get(self, request, format = None):
+        print("Metodo get filter")
+        queryset = Example2.objects.filter(delete = False)
+        #many = True si aplica si retorno multiples objetos
+        serializer = Example2Serializers(queryset, many = True)
+        return Response(serializer.data)
+
+    def post(self,request, format = None):
+        serializer = Example2Serializers(data= request.data)
+        if serializer.is_valid():
+            serializer.save()
+            datas = serializer.data
+            return Response(datas)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+
 class CustonAuthToken(ObtainAuthToken):
 
     def post(self, request, * args, **kwars):
